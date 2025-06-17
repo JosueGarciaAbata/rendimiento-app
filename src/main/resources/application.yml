@@ -18,6 +18,12 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: update
+    properties:
+      hibernate:
+        order_inserts: true
+        jdbc:
+          batch_size: 50
+
 
 management:
   endpoints:

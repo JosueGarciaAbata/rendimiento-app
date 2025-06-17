@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -36,38 +37,37 @@ public class SaleService {
 
     @Transactional
     public Sale save(SaleRequest saleRequest) {
-        // formar la venta
 
-        // crear el encabezado de la venta
-        Client client = clientService.findById(saleRequest.getClientId()); // ya se lanza la excepcion si no existe el cliente.
+        // 1. Pre-cargar en un solo fetch para todos los medicamentos referenciados
+        List<Long> ids = saleRequest.getDetails().stream().map(SaleDetailRequest::getMedicationId).toList();
+        List<Medication> medications = medicationService.findAllById(ids);
+
+        // 2. Contruir la entidad sales
+        Client client =  clientService.findById(saleRequest.getClientId());
         Sale sale = new Sale();
         sale.setClient(client);
-        sale.setCreatedAt(LocalDateTime.now());
 
-        // crear los detalles de la venta
-        List<SaleDetail> listDetails = new ArrayList<>();
+        // 3. Crear la lista con los detalles
+        List<SaleDetail> details = new ArrayList<>();
         for (SaleDetailRequest saleDetailRequest : saleRequest.getDetails()) {
 
-            Medication medication = medicationService.findById(saleDetailRequest.getMedicationId());
-            Integer quantity = saleDetailRequest.getQuantity();
-
-            //if (quantity > medication.getStock()) {
-            //    throw new BusinessException("Stock insuficiente en el medicamento: " + medication.getId());
+            Medication med = medications.get(Integer.parseInt(String.valueOf(saleDetailRequest.getMedicationId())));
+            // controlar stock, por el momento no le tomo en cuenta
+            //if (saleDetailRequest.getQuantity() > med.getStock()) {
+            //    throw new BusinessException("Stock insuficiente en el medicamento: " + med.getId());
             //}
-
-            //medication.reduceStock(quantity);
+            //med.reduceStock(saleDetailRequest.getQuantity());
 
             SaleDetail detail = new SaleDetail();
             detail.setSale(sale);
-            detail.setMedication(medication);
-            detail.setQuantity(quantity);
+            detail.setMedication(med);
+            detail.setQuantity(saleDetailRequest.getQuantity());
             detail.setUnitPrice(saleDetailRequest.getUnitPrice());
-            listDetails.add(detail);
+            details.add(detail);
         }
 
-        sale.setSaleDetails(listDetails);
+        sale.setSaleDetails(details);
 
-        // guardar la venta
         return repository.save(sale);
     }
 

@@ -1,7 +1,9 @@
 package ec.edu.uta.pharmacy.entities;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -30,5 +32,10 @@ public class Sale {
 
     @OneToMany(mappedBy = "sale", cascade = CascadeType.PERSIST)
     private List<SaleDetail> saleDetails;
+
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDateTime.now();
+    }
 
 }

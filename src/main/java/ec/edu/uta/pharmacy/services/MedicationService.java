@@ -19,6 +19,10 @@ public class MedicationService {
         return repository.findAll();
     }
 
+    public List<Medication> findAllById(List<Long> ids) {
+        return repository.findAllById(ids);
+    }
+
     public Medication findById(Long id) {
         return repository.findById(id).orElseThrow(() -> new RuntimeException("Medication Not Found"));
     }
