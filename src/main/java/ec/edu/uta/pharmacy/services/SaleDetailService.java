@@ -1,16 +1,13 @@
 package ec.edu.uta.pharmacy.services;
 
-import ec.edu.uta.pharmacy.entities.Sale;
 import ec.edu.uta.pharmacy.entities.SaleDetail;
 import ec.edu.uta.pharmacy.repositories.SaleDetailRepository;
-import ec.edu.uta.pharmacy.repositories.SaleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -31,8 +28,7 @@ public class SaleDetailService {
     }
 
     public List<SaleDetail> readFirstNDetails(int count) {
-        //Pageable page = PageRequest.of(0, count);
-         //return repository.findAll(page).getContent();
-        return repository.findAll().subList(0, count);
+        Pageable page = PageRequest.of(0, count);
+        return repository.findAll(page).getContent();
     }
 }

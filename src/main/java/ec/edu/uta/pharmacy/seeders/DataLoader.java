@@ -23,8 +23,13 @@ public class DataLoader implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        //insertClients(100000);
-        //insertMedications(10000);
+        if (clientRepository.count() == 0) {
+            insertClients(100000);
+        }
+
+        if (medicationRepository.count() == 0) {
+            insertMedications(10000);
+        }
     }
 
     private void insertClients(int n) {

@@ -1,5 +1,6 @@
 package ec.edu.uta.pharmacy.entities;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,7 +15,9 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-@Table(name = "sales")
+@Table(
+        name = "sales"
+)
 @EntityListeners(AuditingEntityListener.class)
 public class Sale {
 
@@ -31,6 +34,7 @@ public class Sale {
     private Client client;
 
     @OneToMany(mappedBy = "sale", cascade = CascadeType.PERSIST)
+    @JsonManagedReference
     private List<SaleDetail> saleDetails;
 
     @PrePersist

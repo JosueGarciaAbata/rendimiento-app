@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,31 +42,26 @@ public class SaleService {
         // 1. Pre-cargar en un solo fetch para todos los medicamentos referenciados
         List<Long> ids = saleRequest.getDetails().stream().map(SaleDetailRequest::getMedicationId).toList();
         List<Medication> medications = medicationService.findAllById(ids);
+        Map<Long, Medication> medsMap = medications.stream()
+                .collect(Collectors.toMap(Medication::getId, med -> med));
 
         // 2. Contruir la entidad sales
-        Client client =  clientService.findById(saleRequest.getClientId());
         Sale sale = new Sale();
-        sale.setClient(client);
+        sale.setClient(clientService.findById(saleRequest.getClientId()));
+        sale.setCreatedAt(LocalDateTime.now());
 
         // 3. Crear la lista con los detalles
-        List<SaleDetail> details = new ArrayList<>();
-        for (SaleDetailRequest saleDetailRequest : saleRequest.getDetails()) {
-
-            Medication med = medications.get(Integer.parseInt(String.valueOf(saleDetailRequest.getMedicationId())));
-            // controlar stock, por el momento no le tomo en cuenta
-            //if (saleDetailRequest.getQuantity() > med.getStock()) {
-            //    throw new BusinessException("Stock insuficiente en el medicamento: " + med.getId());
-            //}
-            //med.reduceStock(saleDetailRequest.getQuantity());
-
-            SaleDetail detail = new SaleDetail();
-            detail.setSale(sale);
-            detail.setMedication(med);
-            detail.setQuantity(saleDetailRequest.getQuantity());
-            detail.setUnitPrice(saleDetailRequest.getUnitPrice());
-            details.add(detail);
-        }
-
+        List<SaleDetail> details = saleRequest.getDetails().stream()
+                .map(req -> {
+                    Medication med = medsMap.get(req.getMedicationId());
+                    SaleDetail detail = new SaleDetail();
+                    detail.setSale(sale);
+                    detail.setMedication(med);
+                    detail.setQuantity(req.getQuantity());
+                    detail.setUnitPrice(req.getUnitPrice());
+                    return detail;
+                })
+                .toList();
         sale.setSaleDetails(details);
 
         return repository.save(sale);
