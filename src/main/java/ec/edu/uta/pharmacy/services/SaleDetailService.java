@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +31,8 @@ public class SaleDetailService {
     }
 
     public List<SaleDetail> readFirstNDetails(int count) {
-        Pageable page = PageRequest.of(0, count);
-        return repository.findAll(page).getContent();
+        //Pageable page = PageRequest.of(0, count);
+         //return repository.findAll(page).getContent();
+        return repository.findAll().subList(0, count);
     }
 }
