@@ -24,7 +24,7 @@ public class Sale {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @OneToOne()
+    @ManyToOne()
     @JoinColumn(name = "client_id", referencedColumnName = "id")
     private Client client;
 

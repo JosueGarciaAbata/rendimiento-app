@@ -51,11 +51,11 @@ public class SaleService {
             Medication medication = medicationService.findById(saleDetailRequest.getMedicationId());
             Integer quantity = saleDetailRequest.getQuantity();
 
-            if (quantity > medication.getStock()) {
-                throw new BusinessException("Stock insuficiente en el medicamento: " + medication.getId());
-            }
+            //if (quantity > medication.getStock()) {
+            //    throw new BusinessException("Stock insuficiente en el medicamento: " + medication.getId());
+            //}
 
-            medication.reduceStock(quantity);
+            //medication.reduceStock(quantity);
 
             SaleDetail detail = new SaleDetail();
             detail.setSale(sale);

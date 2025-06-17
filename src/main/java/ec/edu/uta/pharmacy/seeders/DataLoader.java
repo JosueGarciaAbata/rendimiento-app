@@ -43,7 +43,7 @@ public class DataLoader implements CommandLineRunner {
         var meds = IntStream.rangeClosed(1, n)
                 .mapToObj(i -> Medication.builder()
                         .price(BigDecimal.valueOf(faker.number().randomDouble(2, 5, 100)))
-                        .stock(faker.number().numberBetween(0, 200))
+                        .stock(faker.number().numberBetween(30000, 100000))
                         .build())
                 .collect(Collectors.toList());
 

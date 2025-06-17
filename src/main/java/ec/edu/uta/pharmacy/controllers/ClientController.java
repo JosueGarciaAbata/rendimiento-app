@@ -3,7 +3,6 @@ package ec.edu.uta.pharmacy.controllers;
 import ec.edu.uta.pharmacy.entities.Client;
 import ec.edu.uta.pharmacy.services.ClientService;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

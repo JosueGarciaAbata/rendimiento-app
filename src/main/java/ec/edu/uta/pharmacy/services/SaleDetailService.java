@@ -5,6 +5,8 @@ import ec.edu.uta.pharmacy.entities.SaleDetail;
 import ec.edu.uta.pharmacy.repositories.SaleDetailRepository;
 import ec.edu.uta.pharmacy.repositories.SaleRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,5 +27,10 @@ public class SaleDetailService {
 
     public SaleDetail save(SaleDetail saleDetail) {
         return repository.save(saleDetail);
+    }
+
+    public List<SaleDetail> readFirstNDetails(int count) {
+        Pageable page = PageRequest.of(0, count);
+        return repository.findAll(page).getContent();
     }
 }

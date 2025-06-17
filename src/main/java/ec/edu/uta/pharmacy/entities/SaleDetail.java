@@ -20,7 +20,7 @@ public class SaleDetail {
     @JoinColumn(name = "sale_id", referencedColumnName = "id")
     private Sale sale;
 
-    @OneToOne()
+    @ManyToOne()
     @JoinColumn(name = "medication_id", referencedColumnName = "id")
     private Medication medication;
 
