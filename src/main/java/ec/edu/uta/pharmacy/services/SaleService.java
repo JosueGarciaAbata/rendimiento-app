@@ -25,8 +25,7 @@ public class SaleService {
 
     private final SaleRepository repository;
     private final ClientService clientService;
-    private final  MedicationService medicationService;
-    private final SaleRepository saleRepository;
+    private final MedicationService medicationService;
 
     public List<Sale> findAll() {
         return repository.findAll();
@@ -38,20 +37,26 @@ public class SaleService {
 
     @Transactional
     public Sale save(SaleRequest saleRequest) {
+        return saveOptimized(saleRequest);
+    }
 
-        // 1. Pre-cargar en un solo fetch para todos los medicamentos referenciados
-        List<Long> ids = saleRequest.getDetails().stream().map(SaleDetailRequest::getMedicationId).toList();
-        List<Medication> medications = medicationService.findAllById(ids);
-        Map<Long, Medication> medsMap = medications.stream()
-                .collect(Collectors.toMap(Medication::getId, med -> med));
+    @Transactional
+    public Sale saveOptimized(SaleRequest saleRequest) {
+        // 1. Pre-cargar en una sola consulta todas las entidades Medication
+        List<Long> medIds = saleRequest.getDetails().stream()
+                .map(SaleDetailRequest::getMedicationId)
+                .toList();
+        List<Medication> meds = medicationService.findAllById(medIds);
+        Map<Long, Medication> medsMap = meds.stream()
+                .collect(Collectors.toMap(Medication::getId, m -> m));
 
-        // 2. Contruir la entidad sales
+        // 2. Construir la entidad Sale
         Sale sale = new Sale();
         sale.setClient(clientService.findById(saleRequest.getClientId()));
         sale.setCreatedAt(LocalDateTime.now());
 
-        // 3. Crear la lista con los detalles
-        List<SaleDetail> details = saleRequest.getDetails().stream()
+        // 3. Crear y asociar los detalles de venta
+        List<SaleDetail> detalles = saleRequest.getDetails().stream()
                 .map(req -> {
                     Medication med = medsMap.get(req.getMedicationId());
                     SaleDetail detail = new SaleDetail();
@@ -62,9 +67,13 @@ public class SaleService {
                     return detail;
                 })
                 .toList();
-        sale.setSaleDetails(details);
+        sale.setSaleDetails(detalles);
 
+        // 4. Guardar todo en batch
         return repository.save(sale);
     }
+
+
+
 
 }
